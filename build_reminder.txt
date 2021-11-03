@@ -1,0 +1,3 @@
+Reminder: Remember to copy the limine.sys file in either
+          the root or /boot directories of one of the partitions
+          on the device, or boot will fail!

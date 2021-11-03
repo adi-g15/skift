@@ -40,7 +40,7 @@ include meta/configs/$(CONFIG).mk
 
 # Set the target architecture.
 # Possible values: x86_32/x86_64
-CONFIG_ARCH           ?=x86_32
+CONFIG_ARCH           ?=x86_64
 
 # Set the toolchaine to use
 # Possible values: gnu/llvm
@@ -69,7 +69,7 @@ CONFIG_KEYBOARD_LAYOUT?=en_us
 
 # Set the bootloader.
 # Possible values: grub, limine
-CONFIG_LOADER         ?=grub
+CONFIG_LOADER         ?=limine
 
 # Enable/disable the logger.
 CONFIG_LOG            ?=true
@@ -84,7 +84,7 @@ CONFIG_STRIP		  ?=true
 CONFIG_MEMORY         ?=256
 
 # Set the name of the distribution.
-CONFIG_NAME           ?=skift
+CONFIG_NAME           ?=skift-remade
 
 # The optimisation level used by the compiler.
 CONFIG_OPTIMISATIONS  ?=-O2
