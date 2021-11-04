@@ -10,3 +10,4 @@ vm/
 *.ignored
 *.out
 *.d
+build

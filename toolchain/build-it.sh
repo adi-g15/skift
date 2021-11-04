@@ -103,44 +103,48 @@ fi
 
 # Build GCC and binutils for the x86_32 target
 # ---------------------------------------------------------------------------- #
+BUILD_32_BIT_TOOLCHAIN=false
 
-TARGET32=i686-pc-skift
+if [ "$BUILD_32_BIT_TOOLCHAIN" = true ]; then
 
-mkdir -p "$DIR/build-x86_32/binutils"
-mkdir -p "$DIR/build-x86_32/gcc"
+    TARGET32=i686-pc-skift
 
-pushd "$DIR/build-x86_32/"
-    unset PKG_CONFIG_LIBDIR # Just in case
+    mkdir -p "$DIR/build-x86_32/binutils"
+    mkdir -p "$DIR/build-x86_32/gcc"
 
-    pushd binutils
-        "$DIR/tarballs/$BINUTILS_DIRECTORY/configure" \
-            --target=$TARGET32 \
-            --prefix=$PREFIX \
-            --with-sysroot=$SYSROOT \
-            --disable-werror || exit 1
+    pushd "$DIR/build-x86_32/"
+        unset PKG_CONFIG_LIBDIR # Just in case
 
-        make -j $MAKEJOBS || exit 1
-        make install || exit 1
+        pushd binutils
+            "$DIR/tarballs/$BINUTILS_DIRECTORY/configure" \
+                --target=$TARGET32 \
+                --prefix=$PREFIX \
+                --with-sysroot=$SYSROOT \
+                --disable-werror || exit 1
+
+            make -j $MAKEJOBS || exit 1
+            make install || exit 1
+        popd
+
+        pushd gcc
+            "$DIR/tarballs/$GCC_DIRECTORY/configure" \
+                --target=$TARGET32 \
+                --prefix=$PREFIX \
+                --disable-nls \
+                --with-newlib \
+                --with-sysroot=$SYSROOT \
+                --enable-languages=c,c++|| exit 1
+
+            make -C "$DIR/../" crosscompiler-headers || exit 1
+
+            make -j $MAKEJOBS all-gcc all-target-libgcc || exit 1
+            make install-gcc install-target-libgcc || exit 1
+
+            make all-target-libstdc++-v3 || exit 1
+            make install-target-libstdc++-v3 || exit 1
+        popd
     popd
-
-    pushd gcc
-        "$DIR/tarballs/$GCC_DIRECTORY/configure" \
-            --target=$TARGET32 \
-            --prefix=$PREFIX \
-            --disable-nls \
-            --with-newlib \
-            --with-sysroot=$SYSROOT \
-            --enable-languages=c,c++|| exit 1
-
-        make -C "$DIR/../" crosscompiler-headers || exit 1
-
-        make -j $MAKEJOBS all-gcc all-target-libgcc || exit 1
-        make install-gcc install-target-libgcc || exit 1
-
-        make all-target-libstdc++-v3 || exit 1
-        make install-target-libstdc++-v3 || exit 1
-    popd
-popd
+fi
 
 # Build GCC and binutils for the x86_64 target
 # ---------------------------------------------------------------------------- #
