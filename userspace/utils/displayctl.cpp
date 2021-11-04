@@ -33,6 +33,7 @@ Opt<IOCallDisplayModeArgs> gfxmode_by_name(String &name)
         }
     }
 
+    // print something
     return NONE;
 }
 
@@ -56,7 +57,9 @@ Shell::ArgParseResult gfxmode_get()
     if (stream_call(device, IOCALL_DISPLAY_GET_MODE, &framebuffer_info) != SUCCESS)
     {
         IO::errln("Ioctl to " FRAMEBUFFER_DEVICE_PATH " failed");
-        return Shell::ArgParseResult::FAILURE;
+        return Shell::ArgParseResult::SHOULD_FINISH;
+        // returning Shell::ArgParseResult::FAILURE causes kernel panic too 
+        // return Shell::ArgParseResult::FAILURE;
     }
 
     IO::outln("Height: {}\nWidth: {}\n",
@@ -110,17 +113,12 @@ Shell::ArgParseResult gfxmode_set(String &mode_name)
     if (!mode.present())
     {
         IO::errln("Error: unknown graphic mode: {}", mode_name);
-        return Shell::ArgParseResult::FAILURE;
+        return Shell::ArgParseResult::SHOULD_FINISH;
+        // returning Shell::ArgParseResult::FAILURE causes kernel panic too 
+        // return Shell::ArgParseResult::FAILURE;
     }
 
     HjResult result = gfxmode_set_compositor(mode.unwrap());
-
-    if (result != HjResult::SUCCESS)
-    {
-        CLEANUP(stream_cleanup)
-        Stream *device = stream_open(FRAMEBUFFER_DEVICE_PATH, HJ_OPEN_READ);
-        result = gfxmode_set_iocall(device, mode.unwrap());
-    }
 
     if (result == HjResult::SUCCESS)
     {
@@ -129,7 +127,12 @@ Shell::ArgParseResult gfxmode_set(String &mode_name)
     }
     else
     {
-        return Shell::ArgParseResult::FAILURE;
+        CLEANUP(stream_cleanup)
+        Stream *device = stream_open(FRAMEBUFFER_DEVICE_PATH, HJ_OPEN_READ);
+        result = gfxmode_set_iocall(device, mode.unwrap());
+        return Shell::ArgParseResult::SHOULD_FINISH;
+        // returning Shell::ArgParseResult::FAILURE causes kernel panic too 
+        // return Shell::ArgParseResult::FAILURE;
     }
 }
 
@@ -156,7 +159,8 @@ int main(int argc, const char *argv[])
 
     args.epiloge("Options can be combined.");
 
-    return args.eval(argc, argv) == Shell::ArgParseResult::FAILURE
-               ? PROCESS_FAILURE
-               : PROCESS_SUCCESS;
+    // Ignoring return value of eval, since returning a PROCESS_FAILURE from main causes a kernel panic
+    auto _ign = args.eval(argc, argv);
+    if(_ign == Shell::ArgParseResult::FAILURE ) {}
+    return PROCESS_SUCCESS;
 }
