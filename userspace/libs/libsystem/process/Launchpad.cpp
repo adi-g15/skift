@@ -10,6 +10,8 @@
 
 Launchpad *launchpad_create(const char *name, const char *executable)
 {
+    // CREATE is basically a define, that simply calls calloc(type,sizeof(type))
+    // defined in /userspace/libs/libutils/Macros.h
     Launchpad *launchpad = CREATE(Launchpad);
 
     strcpy(launchpad->name, name);
@@ -20,6 +22,7 @@ Launchpad *launchpad_create(const char *name, const char *executable)
         handle = HANDLE_INVALID_ID;
     }
 
+    // Q. Why are we hardcoding the handles, if they are equal to their index ?
     launchpad->handles[0] = 0;
     launchpad->handles[1] = 1;
     launchpad->handles[2] = 2;

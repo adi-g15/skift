@@ -28,14 +28,15 @@ void start_desktop()
     start_service("compositor", "/Session/compositor.ipc");
     process_run("panel", nullptr, 0);
 
-    if constexpr (__CONFIG_IS_RELEASE__)
-    {
         process_run("onboarding", nullptr, 0);
-    }
-    else
-    {
-        process_run("terminal", nullptr, 0);
-    }
+    // if constexpr (__CONFIG_IS_RELEASE__)
+    // {
+    //     process_run("onboarding", nullptr, 0);
+    // }
+    // else
+    // {
+    //     process_run("terminal", nullptr, 0);
+    // }
 
     process_cancel(splash_screen_pid);
 

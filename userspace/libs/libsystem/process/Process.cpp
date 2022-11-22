@@ -16,9 +16,18 @@ const char *process_name()
 
 HjResult process_run(const char *command, int *pid, TaskFlags flags)
 {
+    // Q. Why not just pass `command` itself, as Launchpad also basically just
+    // requires an executable ?
+    // Ans. Because, `executable` is the executable path, not the command,
+    // so we first create a process out of some known executable, ie. the shell,
+    // then pass the command to run to shell
     Launchpad *launchpad = launchpad_create("shell", "/Applications/shell/shell");
 
     launchpad_flags(launchpad, flags);
+    
+    // An argument is already there, ie. the executable path, and after that, we
+    // are passing "-c command" for the shell to handle (which in turn executes
+    // that command)
     launchpad_argument(launchpad, "-c");
     launchpad_argument(launchpad, command);
 
